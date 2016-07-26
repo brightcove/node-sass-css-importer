@@ -1,5 +1,23 @@
 var fs = require('fs')
-  , path = require('path');
+  , path = require('path'),
+  resolve = require('resolve');
+
+var resolvePath = function(unresolvedPath) {
+  var resolvedPath = unresolvedPath;
+  var tempPath;
+  var currentCwd = process.cwd();
+  var testString = currentCwd + '/node_modules/';
+
+  if (unresolvedPath.indexOf(testString) === 0) {
+    tempPath = unresolvedPath.replace(testString, '');
+    try {
+      resolvedPath = resolve.sync(tempPath, {
+        basedir: currentCwd
+      });
+    } catch (e) {}
+  }
+  return resolvedPath;
+};
 
 module.exports = function(options) {
   options = options || {import_paths: []};
@@ -27,11 +45,11 @@ module.exports = function(options) {
 
     for (; i < import_paths_len; ++i) {
       import_path = import_paths[i];
-      css_filepath = path.join(import_path, css_path);
+      css_filepath = resolvePath(path.join(import_path, css_path));
       if (fs.existsSync(css_filepath)) {
         return readPath(css_filepath, done);
       } else {
-        css_filepath = path.join(import_path, url.slice(4));
+        css_filepath = resolvePath(path.join(import_path, url.slice(4)));
         if (fs.existsSync(css_filepath)) {
           return readPath(css_filepath, done);
         }

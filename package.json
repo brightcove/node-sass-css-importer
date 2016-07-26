@@ -26,5 +26,8 @@
     "node-sass": "^3.3.2",
     "tap": "^5.0.0",
     "tape": "^4.4.0"
+  },
+  "dependencies": {
+    "resolve": "^1.1.7"
   }
 }
